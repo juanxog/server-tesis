@@ -15,14 +15,31 @@ public class evaluaciones {
 	
 	private Double[] notas;
 	
+	private String curso;
 	
-	public evaluaciones(String id, String[] posibles, Double valor, Double[] notas) {
+
+
+	public evaluaciones(String id, String[] posibles, Double valor, Double[] notas, String curso) {
 		super();
 		this.id = id;
 		this.posibles = posibles;
 		this.valor = valor;
 		this.notas = notas;
+		this.curso = curso;
 	}
+
+
+
+	public String getCurso() {
+		return curso;
+	}
+
+
+
+	public void setCurso(String curso) {
+		this.curso = curso;
+	}
+
 
 
 	public String getId() {

@@ -9,12 +9,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.mongodb.BasicDBObject;
+import com.mongodb.DB;
+import com.mongodb.DBCollection;
+import com.mongodb.DBCursor;
+import com.mongodb.DBObject;
 import com.tesis.gipro.estructuras.Estudiantes;
 import com.tesis.gipro.estructuras.GruposTrabajo;
 import com.tesis.gipro.estructuras.evaluaciones;
@@ -282,22 +288,34 @@ public class RestController {
 	
 	}
 	
-	@RequestMapping(method = RequestMethod.POST, headers = "Accept=application/json")
+	@RequestMapping(value="/gipro/{curso}", method = RequestMethod.POST, headers = "Accept=application/json")
 	@ResponseBody
-	public List<GruposTrabajo> sayHello(ModelMap model,@RequestBody List<Estudiantes> estudiantes) {
+	public List<GruposTrabajo> sayHello(ModelMap model,@RequestBody List<Estudiantes> estudiantes, @PathVariable String curso) {
 		
 		
 		Estudiantes[] universo = new Estudiantes[estudiantes.size()];
 		universo = estudiantes.toArray(universo);
 		
-		/*
-		String [] universo = {"ISTJ",	"ISFJ",	"INFJ",	"INTJ",
-			    "ISTP",	"ISFP",	"INFP",	"INTP",
-			    "ESTP",	"ESFP",	"ENFP",	"ENTP",
-			    "ESTJ",	"ESFJ",	"ENFJ",	"ENTJ"};
-		 */
+		System.out.println( "holaaaaa ----> " + curso);
 		
-		List<evaluaciones> evaluaciones = mt.findAll(evaluaciones.class, "Posibilidades");
+		BasicDBObject allQuery = new BasicDBObject();
+		allQuery.put("curso", curso);
+
+		DB db = mt.getDb();
+		DBCollection collection = db.getCollection("Posibilidades");
+		DBCursor cursor = collection.find(allQuery);
+		
+		List<evaluaciones> evaluaciones = new ArrayList<evaluaciones>();
+		
+		while (cursor.hasNext()) {
+			DBObject obj = cursor.next(); 
+			evaluaciones eva = mt.getConverter().read(evaluaciones.class, obj);
+			System.out.println(eva.getId());
+			System.out.println(eva.getNotas());
+			System.out.println(obj);
+			evaluaciones.add(eva);
+			
+		}
 		
 		
 		String universo_posible[] = {"ISTJ",	"ISFJ",	"INFJ",	"INTJ",
